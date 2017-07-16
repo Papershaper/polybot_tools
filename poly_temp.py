@@ -47,10 +47,21 @@ def temp_stats(temp):
     if ten_min > temp:
         ten_min = temp
 
+def ten_min_process(temps):
+    print(temps)
+    ten_avg = sum(temps)/10
+    print("10 min Values Max:{0:5.3f} Min: {1:5.3f} Avg: {2:5.3f}".format(max(temps), min(temps), ten_avg))
+
+
 print('Temp Sensor Initialized')
+temps = []
 while True:
     temp_data = read_temp()
+    temps.append(temp_data[1])
     temp_stats(temp_data[1])
     dweet_data(temp_data)
-    print(temp_data[0] +" Temp:{0:4.2f}  Max:{1:4.2f} Min: {2:4.2f}".format(temp_data[1],ten_max,ten_min))
+    print(temp_data[0] +" Temp:{0:5.3f}  Max:{1:5.3f} Min: {2:5.3f}".format(temp_data[1],ten_max,ten_min))
+    if len(temps) >= 10:
+        ten_min_process(temps)
+        temps.clear()
     time.sleep(60)
