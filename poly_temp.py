@@ -33,11 +33,13 @@ def read_temp():
         return datetime.datetime.now().isoformat(), temp_c
 
 def dweet_data(data):
+    global outage_count
     rqsStr = dweet_addr+dweet_name+ '?' +dweet_key+ '=' + str(data[1])
     try:
         rqs = requests.get(rqsStr)
-    except ConnectionError:
+    except requests.exceptions.RequestException as e:
         outage_count = outage_count+1
+        print (e)
         print('Connection Error: ' + outage_count)
 
 def temp_stats(temp):
@@ -48,9 +50,10 @@ def temp_stats(temp):
         ten_min = temp
 
 def ten_min_process(temps):
+    global outage_count
     print(temps)
     ten_avg = sum(temps)/10
-    print("10 min Values Max:{0:5.3f} Min: {1:5.3f} Avg: {2:5.3f}".format(max(temps), min(temps), ten_avg))
+    print("10 min Values Max:{0:5.3f} Min: {1:5.3f} Avg: {2:5.3f} Err={3}".format(max(temps), min(temps), ten_avg, outage_count))
 
 
 print('Temp Sensor Initialized')
