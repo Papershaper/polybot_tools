@@ -2,6 +2,7 @@ import requests
 import os
 import time
 import datetime
+import paho.mqtt.publish as publish
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -10,6 +11,8 @@ temp_sensor_file = '/sys/bus/w1/devices/10-000802e80d45/w1_slave'
 dweet_addr = 'https://dweet.io/dweet/for/'
 dweet_name = 'polybot3_telemetry'
 dweet_key = 'external_temp'
+
+host = "192.168.178.88"  #polybase 
 
 outage_count = 0
 ten_max = -100.0
@@ -42,6 +45,9 @@ def dweet_data(data):
         print (e)
         print('Connection Error: ' + str(outage_count))
 
+def pub_mqtt_data(data):
+    publish.single(dweet_name, str(data[1]), hostname=host)
+
 def temp_stats(temp):
     global ten_max, ten_min
     if ten_max < temp:
@@ -65,6 +71,7 @@ while True:
     temps.append(temp_data[1])
     temp_stats(temp_data[1])
     dweet_data(temp_data)
+    pub_mqtt_data(temp_data)
     print(temp_data[0] +" Temp:{0:5.3f}  Max:{1:5.3f} Min: {2:5.3f}".format(temp_data[1],ten_max,ten_min))
     if len(temps) >= 10:
         ten_min_process(temps)
